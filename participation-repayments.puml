@@ -1,0 +1,37 @@
+@startuml
+!define LIGHTORANGE
+!includeurl https://raw.githubusercontent.com/Drakemor/RedDress-PlantUML/master/style.puml
+
+title Monthly Payments/Reporting Participation
+
+autonumber
+skinparam responseMessageBelowArrow true
+
+actor "HVBank Borrower" as borrower order 1
+participant "HVBank" as lender order 3
+participant "RWACo" as governance_reporter order 24
+participant "Ankura Trust" as verifier order 20
+participant "MBPTrust" as trust order 25
+boundary "Real World/\nDigital World" order 35
+participant "Crypto\nBroker" as dai_offramp order 30
+participant "MakerDao" as protocol order 40
+
+borrower -> lender : pay monthly debt/interest and fee payments
+lender -> trust : forwards participation payments
+trust -> trust : prepare monthly remittance report
+trust -> governance_reporter : provide monthly remittance report
+governance_reporter -> governance_reporter : prepare monthly\n remittance report
+governance_reporter -> verifier : verify remittance report
+
+group data upload
+governance_reporter -> protocol : upload remittance data
+end
+
+group smart contract
+trust -> dai_offramp : convert US$ to DAI for monthly payments
+dai_offramp -> trust : transfer DAI to trust
+trust --> protocol : transfer DAI debt repayments to urn
+trust -> protocol : transfer DAI interest/fee payments\n to surplus buffer
+end
+
+@enduml

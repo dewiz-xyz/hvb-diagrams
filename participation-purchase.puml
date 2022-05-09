@@ -1,0 +1,38 @@
+@startuml
+!define LIGHTORANGE
+!includeurl https://raw.githubusercontent.com/Drakemor/RedDress-PlantUML/master/style.puml
+
+title Purchase Participation
+
+autonumber
+skinparam responseMessageBelowArrow true
+
+actor "HVBank Borrower" as borrower order 1
+participant "HVBank" as lender order 3
+participant "RWACo" as governance_reporter order 24
+participant "Ankura Trust" as verifier order 20
+participant "MBPTrust" as trust order 25
+boundary "Real World/\nDigital World" order 35
+participant "Crypto\nBroker" as dai_offramp order 30
+participant "MakerDao" as protocol order 40
+
+borrower -> lender : arrange bank loan
+lender -> borrower : loan agreement
+lender -> trust : Cerificate of Participation - requesting purchase of participation
+trust -> verifier: Certificate of Particpation & purchase verification request
+verifier -> lender: Request for loan/borrower data
+verifier -> verifier : review and due diligence
+
+group off chain reporting 
+verifier -> trust : Portfolio Loan Satisfaction Notice - pre-verifying purchase
+verifier  -> protocol : Upload of participation data
+end
+
+group smart contract
+trust -> protocol : mint $XX.X DAI
+protocol -> dai_offramp : $XX.X DAI
+end
+dai_offramp -> trust : US$XX.X
+trust -> lender : US$XX.X
+
+@enduml
