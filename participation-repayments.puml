@@ -8,30 +8,47 @@ autonumber
 skinparam responseMessageBelowArrow true
 
 actor "HVBank Borrower" as borrower order 1
-participant "HVBank" as lender order 3
-participant "RWACo" as governance_reporter order 24
-participant "Ankura Trust" as verifier order 20
-participant "MBPTrust" as trust order 25
+participant "HVBank" as seller order 3
+participant "Ankura Trust" as calculationAgent order 20
+participant "WSFS" as trustee order 24
+participant "RWA MPT" as trust order 25
+participant "RWA/\n Foundation" as trustSponsor order 30
 boundary "Real World/\nDigital World" order 35
-participant "Crypto\nBroker" as dai_offramp order 30
+participant "Genesis/\n Trading" as exchangeBroker order 30
 participant "MakerDao" as protocol order 40
 
-borrower -> lender : pay monthly debt/interest and fee payments
-lender -> trust : forwards participation payments
-trust -> trust : prepare monthly remittance report
-trust -> governance_reporter : provide monthly remittance report
-governance_reporter -> governance_reporter : prepare monthly\n remittance report
-governance_reporter -> verifier : verify remittance report
+borrower -> seller : pay monthly debt/interest and fee payments
+seller -> trustee : forwards participation payments
 
-group data upload
-governance_reporter -> protocol : upload remittance data
+group reporting
+seller -> calculationAgent : uploads participation remittance report
+exchangeBroker -> calculationAgent : upload trading report
+trustee -> calculationAgent : uploads trust account report
+calculationAgent -> trustee : provision of consolidated remmittance report
+calculationAgent -> protocol : upload of consolidated remittance report
 end
+
 
 group smart contract
-trust -> dai_offramp : convert US$ to DAI for monthly payments
-dai_offramp -> trust : transfer DAI to trust
-trust --> protocol : transfer DAI debt repayments to urn
+trust -> exchangeBroker : convert US$ to DAI for monthly payments
+exchangeBroker -> trust : transfer DAI to trust
 trust -> protocol : transfer DAI interest/fee payments\n to surplus buffer
 end
+
+group participation debt repayments
+trustee -> exchangeBroker : convert US$ to DAI for Debt Repayment
+trustee -> protocol : repayments of underlying debt are paid to urn
+note left 
+debt repayments from the particpations will 
+be reinvested in the trust particpation funding 
+account. Upon termination of 
+the Master Participation Agreement
+remittances representing underlying
+loan repayments will be paid on a 
+monthly basis to the urn until the 
+latest maturity date of the particpations
+held by the trust.
+end note
+end group
 
 @enduml

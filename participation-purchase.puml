@@ -8,31 +8,31 @@ autonumber
 skinparam responseMessageBelowArrow true
 
 actor "HVBank Borrower" as borrower order 1
-participant "HVBank" as lender order 3
-participant "RWACo" as governance_reporter order 24
-participant "Ankura Trust" as verifier order 20
-participant "MBPTrust" as trust order 25
+participant "HVBank" as seller order 3
+participant "Ankura Trust" as calculationAgent order 20
+participant "WSFS\nTrustee" as trustee order 26
+participant "RWA MPT\nTrust" as trust order 25
+participant "RWA\n Foundation" as trustSponsor order 30
 boundary "Real World/\nDigital World" order 35
-participant "Crypto\nBroker" as dai_offramp order 30
+participant "Genesis\nTrading" as exchangeBroker order 32
 participant "MakerDao" as protocol order 40
 
-borrower -> lender : arrange bank loan
-lender -> borrower : loan agreement
-lender -> trust : Cerificate of Participation - requesting purchase of participation
-trust -> verifier: Certificate of Particpation & purchase verification request
-verifier -> lender: Request for loan/borrower data
-verifier -> verifier : review and due diligence
-
-group off chain reporting 
-verifier -> trust : Portfolio Loan Satisfaction Notice - pre-verifying purchase
-verifier  -> protocol : Upload of participation data
+group Drawdown of $100mm Dai to Trust Participation Funding Account
+  protocol -> protocol : Governance \napproval \nof facility
+  protocol -> exchangeBroker : $100mm Dai to broker
+  exchangeBroker -> trustSponsor : US$100mm to seller
+  trustSponsor -> trustee : escrow US$100mm for \ninvestment and participation purchase 
 end
 
-group smart contract
-trust -> protocol : mint $XX.X DAI
-protocol -> dai_offramp : $XX.X DAI
+group Trust purchase of particpation
+  borrower -> seller : arrange bank loan
+  seller -> borrower : loan agreement
+  seller -> calculationAgent : HVB requests purchase \nof participation
+  calculationAgent -> calculationAgent : participation \ndue diligence
+  calculationAgent -> trustee : verifies participation meets criteria
+  calculationAgent -> protocol : upload of particpation \nverification info ??
+  seller -> trustee : delivery of signed participation
+  trustee -> seller : US$xx for pariticpation purchase
 end
-dai_offramp -> trust : US$XX.X
-trust -> lender : US$XX.X
 
 @enduml
